@@ -1,27 +1,38 @@
-using RegistroInventario.Components;
+using System.Globalization;
+using GoldCrew.Data;
+
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+// Cultura con fecha corta estricta dd/MM/yyyy
+var cultura = new CultureInfo("es-DO");
+cultura.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+CultureInfo.DefaultThreadCurrentCulture = cultura;
+CultureInfo.DefaultThreadCurrentUICulture = cultura;
+
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+// Factory: recomendado en Blazor Server para evitar errores de concurrencia del DbContext
+builder.Services.AddDbContextFactory<GoldCrewDbContext>(o =>
+    o.UseSqlite(builder.Configuration.GetConnectionString("GoldCrewDb")));
+
+// Servicios de negocio (se irán registrando por módulo)
+// builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+// builder.Services.AddScoped<IProductoService, ProductoService>();
+// ...
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.Run();
