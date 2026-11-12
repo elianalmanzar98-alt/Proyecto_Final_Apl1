@@ -1,5 +1,8 @@
 ﻿using GoldCrew.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using static GoldCrew.Data.Models.Usuario;
+
 namespace GoldCrew.Data;
 public class GoldCrewDbContext : DbContext
 {
@@ -43,9 +46,9 @@ public class GoldCrewDbContext : DbContext
             .HasForeignKey(d => d.NotaDespachoId).OnDelete(DeleteBehavior.Cascade);
 
         foreach (var fk in mb.Model.GetEntityTypes()
-                     .SelectMany(e => e.GetForeignKeys())
-                     .Where(f => !f.IsOwnership && f.DeleteBehavior == DeleteBehavior.ClientSetNull
-                                 || f.DeleteBehavior == DeleteBehavior.Cascade
+                    .SelectMany(e => e.GetForeignKeys())
+                    .Where(f => !f.IsOwnership && f.DeleteBehavior == DeleteBehavior.ClientSetNull
+                                || f.DeleteBehavior == DeleteBehavior.Cascade
                                     && f.PrincipalEntityType.ClrType != typeof(OrdenCompra)
                                     && f.PrincipalEntityType.ClrType != typeof(NotaDespacho)))
             fk.DeleteBehavior = DeleteBehavior.Restrict;

@@ -1,22 +1,8 @@
-
-
-
 using System.ComponentModel.DataAnnotations;
+using GoldCrew.Data.Enums;
+
 
 namespace GoldCrew.Data.Models;
-
-public enum UnidadMedida
-{
-    Unidad,
-    Kilogramo,
-    Gramo,
-    Litro,
-    Mililitro,
-    Metro,
-    Centimetro,
-    Caja,
-    Paquete
-}
 
 public class Usuario
 {

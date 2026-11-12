@@ -2,6 +2,7 @@ using System.Globalization;
 using GoldCrew.Data;
 
 using Microsoft.EntityFrameworkCore;
+using RegistroInventario.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
