@@ -3,20 +3,35 @@
 @inject CustomAuthStateProvider Auth
 @inject NavigationManager Nav
 
-<AuthorizeView>
-    <Authorized>
-        <nav>
-            <strong>GoldCrew</strong> |
-            <NavLink href="" Match="NavLinkMatch.All">Inicio</NavLink> |
-            <NavLink href="categorias">Categorías</NavLink> |
-            <NavLink href="reportes/categorias">Reporte de categorías</NavLink> |
-            Usuario: @context.User.Identity?.Name (@context.User.FindFirst(ClaimTypes.Role)?.Value) |
-            <button @onclick="CerrarSesion">Cerrar sesión</button>
-        </nav>
-        <hr />
-    </Authorized>
-</AuthorizeView>
-<main>@Body</main>
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar"><NavMenu /></div>
+        </Authorized>
+    </AuthorizeView>
+
+    <main>
+        <AuthorizeView>
+            <Authorized>
+                <div class="top-row px-4">
+                    <span class="me-3">
+                        @context.User.FindFirst("NombreCompleto")?.Value
+                        (@context.User.FindFirst(ClaimTypes.Role)?.Value)
+                    </span>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="CerrarSesion">Cerrar sesión</button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        <article class="content px-4">@Body</article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    Ha ocurrido un error inesperado.
+    <a href="" class="reload">Recargar</a>
+    <span class="dismiss">🗙</span>
+</div>
 
 @code {
     private async Task CerrarSesion()

@@ -1,18 +1,21 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+        <AuthorizeView>
+            <Authorized Context="authState">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+            </Authorized>
             <NotAuthorized Context="authState">
-                @if (authState.User.Identity?.IsAuthenticated != true)
+                @if (routeData.PageType == typeof(RegistroInventario.Components.Pages.Login))
                 {
-                    <RedirectToLogin />
+                    <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
                 }
                 else
                 {
-                    <p><strong>Acceso denegado:</strong> su rol no tiene permiso para esta página.</p>
+                    <RedirectToLogin />
                 }
             </NotAuthorized>
             <Authorizing><p>Cargando...</p></Authorizing>
-        </AuthorizeRouteView>
+        </AuthorizeView>
     </Found>
     <NotFound>
         <LayoutView Layout="typeof(Layout.MainLayout)"><p>Página no encontrada.</p></LayoutView>

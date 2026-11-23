@@ -7,17 +7,29 @@
 @inject CustomAuthStateProvider Auth
 @inject NavigationManager Nav
 
-<h1>GoldCrew: Inicio de sesión</h1>
-
-<EditForm Model="modelo" OnValidSubmit="Entrar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <p><label>Usuario: <InputText @bind-Value="modelo.Usuario" /></label></p>
-    <p><label>Contraseña: <InputText type="password" @bind-Value="modelo.Clave" /></label></p>
-    <button type="submit">Iniciar Sesión</button>
-</EditForm>
-
-@if (!string.IsNullOrEmpty(error)) { <p><strong>@error</strong></p> }
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">RegistroInventario: Inicio de sesión</h5></div>
+            <div class="card-body">
+                <EditForm Model="modelo" OnValidSubmit="Entrar">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    <div class="mb-3">
+                        <label class="form-label">Usuario</label>
+                        <InputText class="form-control" @bind-Value="modelo.Usuario" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <InputText type="password" class="form-control" @bind-Value="modelo.Clave" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </EditForm>
+                @if (!string.IsNullOrEmpty(error)) { <div class="alert alert-danger mt-3">@error</div> }
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private LoginModel modelo = new();
@@ -28,7 +40,7 @@
         var s = await AuthService.LoginAsync(modelo.Usuario, modelo.Clave);
         if (s is null)
         {
-            error = "Inicio de sesión incorrecto. Por favor verifique su usuario y contraseña.";
+            error = "Inicio de sesion incorrecto. Por favor verifique su usuario y contraseña.";
             return;
         }
         await Auth.IniciarSesionAsync(s);

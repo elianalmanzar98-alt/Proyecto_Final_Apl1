@@ -4,53 +4,76 @@
 @inject ICategoriaService Servicio
 @inject IJSRuntime JS
 
-<h1>Categorías</h1>
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">Categorías</h5></div>
+    <div class="card-body">
+        <p class="text-muted">Administre las categorías de productos del inventario.</p>
 
-<fieldset>
-    <legend>Búsqueda</legend>
-    <input @bind="texto" placeholder="Nombre o descripción" />
-    <label><input type="checkbox" @bind="incluirInactivas" /> Incluir inactivas</label>
-    <button @onclick="Cargar">Buscar</button>
-    <a href="reportes/categorias">Ver reporte</a>
-</fieldset>
+        @if (!string.IsNullOrEmpty(mensaje)) { <div class="alert alert-success">@mensaje</div> }
+        @if (!string.IsNullOrEmpty(error)) { <div class="alert alert-danger">@error</div> }
 
-@if (!string.IsNullOrEmpty(mensaje)) { <p><strong>@mensaje</strong></p> }
-@if (!string.IsNullOrEmpty(error)) { <p><strong>@error</strong></p> }
+        <div class="row g-2 mb-4 align-items-center">
+            <div class="col-md-4">
+                <input class="form-control" @bind="texto" placeholder="Nombre o descripción" />
+            </div>
+            <div class="col-auto form-check ms-2">
+                <input class="form-check-input" type="checkbox" id="inactivas" @bind="incluirInactivas" />
+                <label class="form-check-label" for="inactivas">Incluir inactivas</label>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" @onclick="Cargar">Buscar</button>
+                <a class="btn btn-outline-secondary" href="reportes/categorias">Ver reporte</a>
+            </div>
+        </div>
 
-<AuthorizeView Roles="Administrador,Almacenista">
-    <EditForm Model="modelo" OnValidSubmit="Guardar" Context="formContext">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <h2>@(modelo.Id == 0 ? "Nueva categoría" : "Editar categoría")</h2>
-        <p><label>Nombre: <InputText @bind-Value="modelo.Nombre" /></label></p>
-        <p><label>Descripción: <InputText @bind-Value="modelo.Descripcion" /></label></p>
-        <button type="submit">Guardar</button>
-        <button type="button" @onclick="Nuevo">Cancelar</button>
-    </EditForm>
-</AuthorizeView>
+        <AuthorizeView Roles="Administrador,Almacenista">
+            <EditForm Model="modelo" OnValidSubmit="Guardar" class="mb-4" Context="formContext">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                <h6>@(modelo.Id == 0 ? "Nueva categoría" : "Editar categoría")</h6>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre</label>
+                        <InputText class="form-control" @bind-Value="modelo.Nombre" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Descripción</label>
+                        <InputText class="form-control" @bind-Value="modelo.Descripcion" />
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Nuevo">Cancelar</button>
+                    </div>
+                </div>
+            </EditForm>
+        </AuthorizeView>
 
-<h2>Listado (@lista.Count)</h2>
-<table border="1" cellpadding="4">
-    <thead><tr><th>Id</th><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
-    <tbody>
-    @foreach (var c in lista)
-    {
-        <tr>
-            <td>@c.Id</td><td>@c.Nombre</td><td>@c.Descripcion</td>
-            <td>@(c.Activo ? "Activa" : "Inactiva")</td>
-            <td>
-                <AuthorizeView Roles="Administrador,Almacenista">
-                    @if (c.Activo)
-                    {
-                        <button @onclick="() => Editar(c)">Modificar</button>
-                        <button @onclick="() => Eliminar(c)">Eliminar</button>
-                    }
-                </AuthorizeView>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Id</th><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var c in lista)
+            {
+                <tr>
+                    <td>@c.Id</td><td>@c.Nombre</td><td>@c.Descripcion</td>
+                    <td>@(c.Activo ? "Activa" : "Inactiva")</td>
+                    <td>
+                        <AuthorizeView Roles="Administrador,Almacenista">
+                            @if (c.Activo)
+                            {
+                                <button class="btn btn-primary btn-sm" @onclick="() => Editar(c)">Modificar</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(c)">Eliminar</button>
+                            }
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <p><strong>Cantidad de categorías:</strong> @lista.Count</p>
+    </div>
+</div>
 
 @code {
     private List<Categoria> lista = new();
@@ -75,20 +98,20 @@
         mensaje = error = null;
         try
         {
-            if (modelo.Id == 0) { await Servicio.CrearAsync(modelo); mensaje = "Categoria creada con exito."; }
+            if (modelo.Id == 0) { await Servicio.CrearAsync(modelo); mensaje = "Categoría creada con éxito."; }
             else { await Servicio.ActualizarAsync(modelo); mensaje = "Categoría actualizada con éxito."; }
             Nuevo();
             await Cargar();
         }
         catch (ReglaNegocioException ex) { error = ex.Message; }
-        catch (Exception ex) { error = $"Error inesperado en el apartado de Categorias: {ex.Message}"; }
+        catch (Exception ex) { error = $"Error inesperado en el apartado de Categorías: {ex.Message}"; }
     }
 
     private async Task Eliminar(Categoria c)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la categoria '{c.Nombre}'?")) return;
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la categoría '{c.Nombre}'?")) return;
         mensaje = error = null;
-        try { await Servicio.EliminarAsync(c.Id); mensaje = "Categoria eliminada con exito."; await Cargar(); }
+        try { await Servicio.EliminarAsync(c.Id); mensaje = "Categoría eliminada con éxito."; await Cargar(); }
         catch (ReglaNegocioException ex) { error = ex.Message; }
     }
 }
