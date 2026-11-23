@@ -1,0 +1,41 @@
+
+@page "/reportes/categorias"
+@using GoldCrew.Services
+@inject ICategoriaService Servicio
+@inject IJSRuntime JS
+
+<h1>Reporte de categorías</h1>
+<p>Fecha de emisión: @DateTime.Today.ToString("dd/MM/yyyy")</p>
+<button @onclick="Imprimir">Imprimir</button>
+
+@if (datos is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <table border="1" cellpadding="4">
+        <thead><tr><th>Categoría</th><th>Productos activos</th></tr></thead>
+        <tbody>
+        @foreach (var d in datos) { <tr><td>@d.Categoria</td><td>@d.Cantidad</td></tr> }
+        </tbody>
+        <tfoot><tr><th>Total</th><th>@datos.Sum(x => x.Cantidad)</th></tr></tfoot>
+    </table>
+
+    <h2>Productos activos por categoría</h2>
+    var maxCantidad = datos.Max(x => x.Cantidad);
+    @foreach (var d in datos)
+    {
+        <div>
+            <span>@d.Categoria</span>
+            <progress max="@(maxCantidad > 0 ? maxCantidad : 1)" value="@d.Cantidad"></progress>
+            <span>@d.Cantidad</span>
+        </div>
+    }
+}
+
+@code {
+    private List<ResumenCategoria>? datos;
+    protected override async Task OnInitializedAsync() => datos = await Servicio.ResumenProductosAsync();
+    private async Task Imprimir() => await JS.InvokeVoidAsync("print");
+}

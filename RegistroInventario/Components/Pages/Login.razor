@@ -1,0 +1,45 @@
+@page "/login"
+@using GoldCrew.Services
+@using GoldCrew.Web.Security
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+@inject IAuthService AuthService
+@inject CustomAuthStateProvider Auth
+@inject NavigationManager Nav
+
+<h1>GoldCrew: Inicio de sesión</h1>
+
+<EditForm Model="modelo" OnValidSubmit="Entrar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <p><label>Usuario: <InputText @bind-Value="modelo.Usuario" /></label></p>
+    <p><label>Contraseña: <InputText type="password" @bind-Value="modelo.Clave" /></label></p>
+    <button type="submit">Iniciar Sesión</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(error)) { <p><strong>@error</strong></p> }
+
+@code {
+    private LoginModel modelo = new();
+    private string? error;
+
+    private async Task Entrar()
+    {
+        var s = await AuthService.LoginAsync(modelo.Usuario, modelo.Clave);
+        if (s is null)
+        {
+            error = "Inicio de sesión incorrecto. Por favor verifique su usuario y contraseña.";
+            return;
+        }
+        await Auth.IniciarSesionAsync(s);
+        Nav.NavigateTo("/");
+    }
+
+    private class LoginModel
+    {
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Error en el inicio de sesion: el campo 'Usuario' es obligatorio")]
+        public string Usuario { get; set; } = "";
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "error en el inicio de sesion: el campo 'Contraseña' es obligatorio")]
+        public string Clave { get; set; } = "";
+    }
+}

@@ -1,4 +1,6 @@
 ﻿@page "/categorias"
+@using GoldCrew.Services
+@using static GoldCrew.Data.Models.Usuario
 @inject ICategoriaService Servicio
 @inject IJSRuntime JS
 
@@ -16,7 +18,7 @@
 @if (!string.IsNullOrEmpty(error)) { <p><strong>@error</strong></p> }
 
 <AuthorizeView Roles="Administrador,Almacenista">
-    <EditForm Model="modelo" OnValidSubmit="Guardar">
+    <EditForm Model="modelo" OnValidSubmit="Guardar" Context="formContext">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <h2>@(modelo.Id == 0 ? "Nueva categoría" : "Editar categoría")</h2>
@@ -73,20 +75,20 @@
         mensaje = error = null;
         try
         {
-            if (modelo.Id == 0) { await Servicio.CrearAsync(modelo); mensaje = "Categoría creada con éxito."; }
+            if (modelo.Id == 0) { await Servicio.CrearAsync(modelo); mensaje = "Categoria creada con exito."; }
             else { await Servicio.ActualizarAsync(modelo); mensaje = "Categoría actualizada con éxito."; }
             Nuevo();
             await Cargar();
         }
         catch (ReglaNegocioException ex) { error = ex.Message; }
-        catch (Exception ex) { error = $"Error inesperado en el apartado de Categorías: {ex.Message}"; }
+        catch (Exception ex) { error = $"Error inesperado en el apartado de Categorias: {ex.Message}"; }
     }
 
     private async Task Eliminar(Categoria c)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la categoría '{c.Nombre}'?")) return;
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar la categoria '{c.Nombre}'?")) return;
         mensaje = error = null;
-        try { await Servicio.EliminarAsync(c.Id); mensaje = "Categoría eliminada con éxito."; await Cargar(); }
+        try { await Servicio.EliminarAsync(c.Id); mensaje = "Categoria eliminada con exito."; await Cargar(); }
         catch (ReglaNegocioException ex) { error = ex.Message; }
     }
 }

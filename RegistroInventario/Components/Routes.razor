@@ -1,6 +1,20 @@
-﻿<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized Context="authState">
+                @if (authState.User.Identity?.IsAuthenticated != true)
+                {
+                    <RedirectToLogin />
+                }
+                else
+                {
+                    <p><strong>Acceso denegado:</strong> su rol no tiene permiso para esta página.</p>
+                }
+            </NotAuthorized>
+            <Authorizing><p>Cargando...</p></Authorizing>
+        </AuthorizeRouteView>
     </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(Layout.MainLayout)"><p>Página no encontrada.</p></LayoutView>
+    </NotFound>
 </Router>

@@ -16,7 +16,7 @@ public class AuthService : IAuthService
         if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrEmpty(clave)) return null;
         await using var db = await _factory.CreateDbContextAsync();
         var u = await db.Usuarios.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.NombreUsuario == usuario.Trim() && x.Activo);
+            .FirstOrDefaultAsync(x => x.NombreUsuario == usuario.Trim() && x.ACtivo);
         if (u is null || !BCrypt.Net.BCrypt.Verify(clave, u.ClaveHash)) return null;
         return new SesionUsuario(u.Id, u.NombreUsuario, u.NombreCompleto, u.Rol.ToString());
     }
